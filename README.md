@@ -1,5 +1,5 @@
 # DK_Snowflake_Dynamic_Table_Example
-Dynamic Table Example
+
 Welcome to the Snowflake Dynamic Table Demo! This demo showcases the creation and usage of dynamic tables in Snowflake, focusing on building a pipeline to calculate revenue from orders.
 
 Prerequisites
