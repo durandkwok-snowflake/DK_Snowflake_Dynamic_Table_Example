@@ -144,6 +144,8 @@ show dynamic tables in schema;
 
 select * from daily_revenue;
 
+<img width="1082" alt="image" src="https://github.com/durandkwok-snowflake/DK_Snowflake_Dynamic_Table_Example/assets/109616231/55ce37cf-0851-420d-9fc9-6d20607bfd6b">
+
 
 ---------------------------------------------------------------------
 -- Create Dynamic Table to validate with referential integrity
@@ -160,6 +162,9 @@ create or replace dynamic table unknown_products
 
 select * from unknown_products;
 -- Noticed there are order lines where product_id is not in product table
+
+<img width="1077" alt="image" src="https://github.com/durandkwok-snowflake/DK_Snowflake_Dynamic_Table_Example/assets/109616231/a58eaa59-1d75-4be6-8070-34c63bb513fb">
+
 
 ---------------------------------------------------------------------
 -- Run Insert products again to show DT gets updated incrementaly
