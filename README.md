@@ -6,14 +6,16 @@ Prerequisites
 Before running the demo, make sure you have access to a Snowflake account and have the required privileges to execute the SQL statements provided.
 
 Setup
-sql
-Copy code
 -- Create a database and schema
 create database dt_database;
 use database dt_database;
 
 create schema dt_schema;
 use schema dt_schema;
+
+-- Create tables
+-- (Code for creating tables is provided in the demo script)
+
 
 -- Create tables
 -- (Code for creating tables is provided in the demo script)
