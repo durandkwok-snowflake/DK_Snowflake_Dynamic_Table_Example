@@ -102,6 +102,7 @@ group by day;
 -- Display records from the "enriched_lines" table.
 ---------------------------------------------------------------------
 -- stage
+
 create or replace dynamic table enriched_lines 
   lag = '1 minute'
   warehouse = 'DT_WH'
