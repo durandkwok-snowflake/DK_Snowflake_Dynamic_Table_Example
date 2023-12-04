@@ -161,6 +161,7 @@ select * from unknown_products;
 ---------------------------------------------------------------------
 
 -- Query unknow_products again to show up to date
+
 select * from unknown_products;
 
 
