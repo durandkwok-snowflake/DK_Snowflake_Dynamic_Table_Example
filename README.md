@@ -8,9 +8,11 @@ Before running the demo, make sure you have access to a Snowflake account and ha
 Setup
 -- Create a database and schema
 create database dt_database;
+
 use database dt_database;
 
 create schema dt_schema;
+
 use schema dt_schema;
 
 -- Create tables
