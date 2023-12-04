@@ -6,7 +6,9 @@ Prerequisites
 Before running the demo, make sure you have access to a Snowflake account and have the required privileges to execute the SQL statements provided.
 
 Setup
+---------------------------------------------------------------------
 -- Create a database and schema
+---------------------------------------------------------------------
 
 create database dt_database;
 
@@ -16,38 +18,153 @@ create schema dt_schema;
 
 use schema dt_schema;
 
--- Create tables
--- (Code for creating tables is provided in the demo script)
+---------------------------------------------------------------------
+-- Create tables for products, orders, and order lines.
+---------------------------------------------------------------------
+create or replace table products(
+    id int, name string, category string, price number);
+create or replace table orders(
+    id int, order_time timestamp);
+create or replace table lines(
+    id int, order_id int, product_id int, count int);
+
+---------------------------------------------------------------------
+-- Next couple of steps is to Generate sample data for 1,000 products, 1,000 orders, and 10,000 order lines.
+-- Generate 1k products with sequence
+---------------------------------------------------------------------
+create or replace sequence product_ids start = 10000;
+
+insert into products
+  select
+    product_ids.nextval
+      id,      -- product ids start with '1'
+    randstr(abs(random()) % 7 + 3, random()) 
+      name,     -- random strings of length 3–10
+    randstr(1, random()) 
+      category, -- random strings of length 1
+    uniform(0.50, 100, random()) 
+      price     -- random between $0.50 and $100
+  from table(generator(rowcount => 1e3));
+
+select count(*) from products;
+
+---------------------------------------------------------------------
+-- Generate 1k orders
+---------------------------------------------------------------------
+create or replace sequence order_ids start = 2000000;
+
+insert into orders 
+  select
+    order_ids.nextval
+      id,       -- order ids start with '2'
+    timeadd(minute, id, '2020-01-01 0:00')
+      order_time  -- 1 order per minute starting in 2020.
+  from table(generator(rowcount => 1e3));
+
+select count(*) from orders;
+
+---------------------------------------------------------------------
+-- Generate 10K lines
+---------------------------------------------------------------------
+create or replace sequence line_ids start = 30000000;
+
+insert overwrite into lines
+  select
+    line_ids.nextval
+      id,         -- line ids start with '3'
+    trunc(id / 10) - 1e6
+      order_id,   -- 10 lines per order
+    uniform(10000, 11000, random())
+      product_id, -- random product
+    uniform(1, 5, random())
+      count       -- random count
+  from table(generator(rowcount => 1e4));
+
+select count(*) from lines;
+
+---------------------------------------------------------------------
+-- Pipeline!
+-- Goal is to calculate the revenue from the orders
+---------------------------------------------------------------------
+select
+ date_trunc(day, order_time) day,
+ sum(count) item_count,
+ sum(price * count) revenue
+from orders o, lines l, products p
+where true
+and o.id = l.order_id
+and p.id = l.product_id
+group by day;
+
+---------------------------------------------------------------------
+-- First step for building pipeline to join the tables together
+-- Create a dynamic table named "enriched_lines" by joining the "orders," "lines," and "products" tables.
+-- Display records from the "enriched_lines" table.
+---------------------------------------------------------------------
+-- stage
+create or replace dynamic table enriched_lines 
+  lag = '1 minute'
+  warehouse = 'DT_WH'
+as
+  select product_id, order_id, l.id line_id, order_time, name, category, price, count
+  from orders o, lines l, products p
+  where true
+    and o.id = l.order_id
+    and p.id = l.product_id;
+
+select * from enriched_lines;
+
+set created_first_time = current_timestamp();
+
+---------------------------------------------------------------------
+-- 2nd step is to build a DT on top of the enrich_lines 
+-- Create another dynamic table named "daily_revenue" by aggregating data from the "enriched_lines" table.
+-- Display records from the "daily_revenue" table.
+---------------------------------------------------------------------
+-- analyze
+create or replace dynamic table daily_revenue
+  lag = '1 minute'
+  warehouse = 'DT_WH'
+  as
+    select date_trunc(day, order_time) day, sum(count) item_count, sum(price * count) revenue
+    from enriched_lines
+    group by day;
+
+-- Check to see if Dynamic Tables got created
+show dynamic tables in schema;
+
+-- Check to if Daily_Revenue is working
+select * from daily_revenue;
 
 
--- Create tables
--- (Code for creating tables is provided in the demo script)
-Demo Steps
-The demo includes the following steps:
+---------------------------------------------------------------------
+-- Create Dynamic Table to validate with referential integrity
+---------------------------------------------------------------------
+create or replace dynamic table unknown_products
+  lag = '1 minute'
+  warehouse = 'DT_WH'
+  as
+    select l.id line_id, order_id, product_id
+    from lines l left join products p
+    on l.product_id = p.id
+    where p.id is null;
 
-Generate Sample Data:
+select * from unknown_products;
+-- Noticed there are order lines where product_id is not in product table
 
-Create tables for products, orders, and order lines.
-Generate sample data for 1,000 products, 1,000 orders, and 10,000 order lines.
-Explore Data:
+---------------------------------------------------------------------
+-- Run Insert products again to show DT gets updated incrementaly
+---------------------------------------------------------------------
 
-Display information about the created tables.
-Display sample records from the "orders" and "lines" tables.
-Build Pipeline - First Step:
+-- Query unknow_products again to show up to date
+select * from unknown_products;
 
-Create a dynamic table named "enriched_lines" by joining the "orders," "lines," and "products" tables.
-Display records from the "enriched_lines" table.
-Build Pipeline - Second Step:
 
-Create another dynamic table named "daily_revenue" by aggregating data from the "enriched_lines" table.
-Display records from the "daily_revenue" table.
-Dynamic Table History:
+----------------------------------------------------------------------------------------------
+-- End of Demo
+----------------------------------------------------------------------------------------------
 
-View the history of dynamic tables using the information_schema.dynamic_table_graph_history function.
-Additional Examples:
 
-Create a dynamic table named "unknown_products" to validate with referential integrity.
-Run additional queries to demonstrate the dynamic updating of tables.
 Conclusion
 This Snowflake Dynamic Table Demo showcases the power and flexibility of dynamic tables for building data pipelines and performing analytical tasks. Feel free to explore and adapt the provided script to suit your specific use cases.
 
