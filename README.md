@@ -186,6 +186,8 @@ insert into products
 
 select * from unknown_products;
 
+<img width="1078" alt="image" src="https://github.com/durandkwok-snowflake/DK_Snowflake_Dynamic_Table_Example/assets/109616231/f21e1feb-7e65-4c8a-b472-b6e2d6e2c5d9">
+
 
 ----------------------------------------------------------------------------------------------
 -- End of Demo
