@@ -121,7 +121,7 @@ set created_first_time = current_timestamp();
 -- Create another dynamic table named "daily_revenue" by aggregating data from the "enriched_lines" table.
 -- Display records from the "daily_revenue" table.
 ---------------------------------------------------------------------
--- analyze
+
 create or replace dynamic table daily_revenue
   lag = '1 minute'
   warehouse = 'DT_WH'
