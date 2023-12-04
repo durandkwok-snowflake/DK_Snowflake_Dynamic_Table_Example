@@ -119,7 +119,9 @@ set created_first_time = current_timestamp();
 
 ---------------------------------------------------------------------
 -- 2nd step is to build a DT on top of the enrich_lines 
+
 -- Create another dynamic table named "daily_revenue" by aggregating data from the "enriched_lines" table.
+
 -- Display records from the "daily_revenue" table.
 ---------------------------------------------------------------------
 
