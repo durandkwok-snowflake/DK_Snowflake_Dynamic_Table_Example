@@ -23,8 +23,10 @@ use schema dt_schema;
 ---------------------------------------------------------------------
 create or replace table products(
     id int, name string, category string, price number);
+    
 create or replace table orders(
     id int, order_time timestamp);
+    
 create or replace table lines(
     id int, order_id int, product_id int, count int);
 
