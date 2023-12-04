@@ -132,15 +132,18 @@ create or replace dynamic table daily_revenue
     group by day;
 
 -- Check to see if Dynamic Tables got created
+
 show dynamic tables in schema;
 
 -- Check to if Daily_Revenue is working
+
 select * from daily_revenue;
 
 
 ---------------------------------------------------------------------
 -- Create Dynamic Table to validate with referential integrity
 ---------------------------------------------------------------------
+
 create or replace dynamic table unknown_products
   lag = '1 minute'
   warehouse = 'DT_WH'
