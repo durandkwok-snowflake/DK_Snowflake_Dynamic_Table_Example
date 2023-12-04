@@ -119,6 +119,9 @@ select * from enriched_lines;
 
 set created_first_time = current_timestamp();
 
+<img width="1076" alt="image" src="https://github.com/durandkwok-snowflake/DK_Snowflake_Dynamic_Table_Example/assets/109616231/c20063f2-3b72-4f0a-9f7f-1a650e353152">
+
+
 ---------------------------------------------------------------------
 -- 2nd step is to build a DT on top of the enrich_lines 
 -- Create another dynamic table named "daily_revenue" by aggregating data from the "enriched_lines" table.
