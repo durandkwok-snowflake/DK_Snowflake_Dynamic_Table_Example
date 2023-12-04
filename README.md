@@ -160,6 +160,18 @@ select * from unknown_products;
 -- Run Insert products again to show DT gets updated incrementaly
 ---------------------------------------------------------------------
 
+insert into products
+  select
+    product_ids.nextval
+      id,      -- product ids start with '1'
+    randstr(abs(random()) % 7 + 3, random()) 
+      name,     -- random strings of length 3–10
+    randstr(1, random()) 
+      category, -- random strings of length 1
+    uniform(0.50, 100, random()) 
+      price     -- random between $0.50 and $100
+  from table(generator(rowcount => 1e3));
+  
 -- Query unknow_products again to show up to date
 
 select * from unknown_products;
